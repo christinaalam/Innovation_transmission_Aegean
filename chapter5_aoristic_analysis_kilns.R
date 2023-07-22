@@ -1,4 +1,4 @@
-##chapter 4, kiln aoristic analysis
+##chapter 5, kiln aoristic analysis
 
 
 ## Aoristic Analysis
@@ -43,7 +43,7 @@ axis(side=1,at=aoristic_dates,labels=paste((aoristic_dates)*-1), cex.axis=0.6)
 dev.off()
 
 ##aoristic weight for each location over time, formula after
-## Crema 2012 page 447
+## Crema (2012:447)
 
 ##function calculating aoristic weight per year for each kiln location
 
@@ -69,7 +69,7 @@ for (i in 1:nrow(kilnss)){
   tm[[i]] <- c(bef, pres, aft)
 }
 
-##Wednesday plot time maps with site weights
+## Temporal maps with aoristic weights
 
 
 ##load libraries
@@ -101,7 +101,7 @@ aegean <- spTransform(aegean, utm35Nwgs84) #project to specified crs
 points5 <- spTransform(points4, utm35Nwgs84) #project to specified crs
 
 
-##FUNCTION DEFINITION 3 BEGINS HERE - NEEDS DEBUGGING 07/03
+##Plotting function
 plot.fun <- function(Timestep,Nodes,weights,region, date){ 
   Nodes$Value <- weights[,Timestep]
   Nodes$Colour  <- colourvalues::colour_values(Nodes$Value, palette = "reds")
