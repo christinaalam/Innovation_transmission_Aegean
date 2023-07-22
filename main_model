@@ -66,7 +66,7 @@ dur <- sum(phlen)
 tstep <- dur
 alpha <- c(1)
 kappa <- c(0.4)
-loss <- 1 ##trait loss allowed when loss = 1, set loss = 0 for no loss
+loss <- 1 #trait loss allowed when loss = 1, set loss = 0 for no loss
 mu <- c(0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0)
 
 ##load spatial data
@@ -135,10 +135,10 @@ resultsllist <- vector(mode = "list", length = length(alpha))
 nranl <- vector(mode = "list", length = length(alpha))
 for (a in 1:length(alpha)){
   nran0 <- spsample(aegean, n=nnodes, type="random")
-  nran00 <- nran0[-1] #remove one point from nran0 so that when i add the origin i will still have a pop = nnodes
-  nran <- rbind(nran00, all[7]) ##add topleft origin point, which will be the last element of nran
+  nran00 <- nran0[-1] #remove one point from nran0 so that when I add the origin I will still have a pop = nnodes
+  nran <- rbind(nran00, all[7]) ##add index of origin point from the 'all' vector
   nran$siteid <- row.names(nran) ##add siteid column to nran
-  distmat <- gDistance(nran, byid=TRUE)
+  distmat <- gDistance(nran, byid=TRUE) 
   weights <- distmat/1000 #meters to km
   resultsl <- vector(mode = "list", length = length(kappa))
   weightl <- vector(mode = "list", length = length(kappa))
@@ -146,9 +146,8 @@ for (a in 1:length(alpha)){
     weightl[[l]] <- apply(weights, 1, FUN=distfun.exp, b=kappa[l])
     diag(weightl[[l]]) <- 0 #so that nodes don't increase on their own
     
-    bg <- which.max(nran$x) #find index of point with max longitude (easternmost)
     trait <- rep(c(0),each = nnodes)
-    trait[bg] <- 0.1 # this sets the origin point trait proportion value
+    trait[nnodes] <- 0.1 # this sets the origin point trait proportion value
     trait0 <- trait
     
     results <- matrix(NA, nrow = nnodes, ncol = tstep) # results matrix (size is determined by parameter values set at the beginning)
@@ -194,7 +193,7 @@ maxloss_results_list[[m]] <- resultsllist
 ## It fits logistic model using SSlogis, a method that self starts fitting a logistic function.
 
 
-##Function that fits SSlogis 28/5/2022
+##Function that fits SSlogis
 ## the if statement controls for the case where the self starting model gives an error
 ## the else case (where there is no error) fits the logistic model
 ## the function's output is the scaling value used for each case
@@ -231,7 +230,7 @@ for (m in 1:length(mu)){
 
 ##plot param space map
 
-##pdf("sweep30012023_scaling_loss_n2000_seed1_eastorigin_narrowkappa.pdf")
+##pdf("sweep_scaling_loss.pdf")
 
 colnames(scal_mat) <- as.character(kappa)
 rownames(scal_mat) <- as.character(mu)
@@ -299,7 +298,7 @@ for (i in 1:length(mcsamptemp)){
 
 ## This plots a histogram of the scaling values
 
-hist(-mc_scalings) ##mc scalings are normally distributed, the - symbol helps re-invert the time axis
+hist(-mc_scalings) ## mc scalings are normally distributed, the - symbol helps re-invert the time axis
 
 ## compare empirical mc scalings to the scaling produced by the one of the simulations-
 ## each comparison produces a distribution of scaling differences
@@ -333,7 +332,7 @@ for (j in 1:ncol(scal_diff)){
 ##Plots
 
 
-pdf("sweep02062022_compare_meanmcempir_simulated2.pdf")
+pdf("sweep_compare_meanmcempir_simulated.pdf")
 lattice::levelplot(scal_diff_mean, xlab="mu",
                    ylab="kappa",col.regions = terrain.colors(100), row.values = mu,
                    column.values = kappa)
@@ -341,7 +340,7 @@ dev.off()
 
 
 
-pdf("variableloss_may2023_compare_meanmcempir_scaling_loss_n2000_seed1_eastorigin_k0.4a1.pdf")
+pdf("vcompare_meanmcempir_scaling.pdf")
 
 colnames(scal_diff_mean) <- as.character(kappa)
 rownames(scal_diff_mean) <- as.character(mu)
