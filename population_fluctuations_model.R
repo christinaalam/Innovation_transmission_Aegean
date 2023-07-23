@@ -2,9 +2,13 @@ library(sp)
 library(rgdal)
 library(maptools)
 library(rgeos)
+library(scales)
+library(colourvalues)
+library(magick)
+library(animation)
 
 
-set.seed(1) #seed for reproducible results
+set.seed(1) #seed for random number generation
 #number of timesteps
 tstep <- 160
 ph <- c(1:tstep) #vector of timestep values
@@ -35,7 +39,6 @@ aegean <- readOGR(dsn=directory, layer="aeg") #vector map
 utm35Nwgs84 <- CRS("+init=epsg:32635") #set crs
 aegean <- spTransform(aegean, utm35Nwgs84)
 
-##END DATA LOADING
 
 
 ##BEGIN FUNCTION DEFINITIONS
@@ -243,11 +246,7 @@ for (i in 1:length(amp)){
 
 dev.off()
 
-##load libraries for plotting
-library(scales)
-library(colourvalues)
-
-##FUNCTION DEFINITION 3 BEGINS HERE - NEEDS DEBUGGING 07/03
+##Plotting function
 plot.fun.realistic.loss <- function(Timestep,Nodes,Results, meantrend){
   Nodes$Value <- Results[[Timestep]]
   Nodes$Colour  <- colourvalues::colour_values(Nodes$Value)
@@ -264,30 +263,24 @@ plot.fun.realistic.loss <- function(Timestep,Nodes,Results, meantrend){
 }  
 
 
-
 ##Data
 meanaki <- resultsl[[3]]
 
 
 ##test, apply function to a single timestep
 
-pdf("t1500_loss_anatolian_origin_a1k0.4maxloss_0_n2000seed1.pdf", width = 10, height = 7, paper = "USr")
+pdf("timestep10.pdf", width = 10, height = 7, paper = "USr")
 
 t <- 10
 plot.fun.realistic.loss(Timestep = t,Nodes=nodeslist[[t]], Results=nresults2, meantrend = meanaki)
 
 dev.off()
 
-##load libraries
-
-library(magick)
-library(animation)
-
 ##map and timeseries, using plot.fun 3
 
 saveGIF({
   for (i in 1:160) plot.fun.realistic.loss(Timestep = i,Nodes=nodeslist[[i]], Results=nresults2, meantrend = meanaki)},
-  movie.name = "popfluct052023k0.2experiment10nn.gif",interval = 0.1, ani.height = 500, ani.width = 500
+  movie.name = "simulation_video_population_fluctuations.gif",interval = 0.1, ani.height = 500, ani.width = 500
 )
 
 
