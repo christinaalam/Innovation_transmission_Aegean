@@ -1,6 +1,3 @@
-##17 March 2022
-
-
 ##load libraries
 
 library(rgdal)
