@@ -1,6 +1,3 @@
-##This script includes a function to compare simulation to empirical data and sets up a workflow to 
-##sweep parameter values and produce a parameter space map.
-
 ##load libraries
 
 library(rgdal)
@@ -14,7 +11,7 @@ library(readxl)
 library(lattice)
 library(raster)
 
-##FUNCTION DEFINITIONS
+##Function definitions
 
 ##define diffusion function
 diffusion <- function(x, wm, a, cap=1){
@@ -64,10 +61,10 @@ alpha <- c(1)
 kappa <- c(0.5)
 origin <- 0.1
 tstep <- 100
-rad <- 10 ##radius of circle
+rad <- 10 #radius of circle
 div <- 10
 n <- 20
-loss <- 1 ##trait loss allowed when loss = 1, set loss = 0 for no loss
+loss <- 1 #trait loss allowed when loss = 1, set loss = 0 for no loss
 
 ##set up the points and network
 
@@ -143,7 +140,7 @@ for (a in 1:length(alpha)){
 ##}
 
 ##save results of 1000 simulations
-##capture.output(simulation_list, file = "toy3loss1000simsk0.5a1n20or0.01.csv")
+##capture.output(simulation_list, file = "toy2.csv")
 
 
 ##edge list
@@ -190,9 +187,7 @@ upper <- meanaki + sdaki
 lower <- meanaki - sdaki
 
 
-##calculate node degree 08/02/SUCCESS!!
-
-##try with the sna package
+##calculate node degree with the sna package
 
 library(sna)
 
@@ -200,6 +195,7 @@ weightz <- weightmatl[[1]][[1]]
 deg <- sna::degree(weightz,ignore.eval=FALSE) ##second argument includes weights in the calculation of betw
 
 ##check correlation between strength and trait values 
+
 t <- tstep
 correl <- cor.test(resultaki[,t],deg, method = 'pearson')
 
@@ -234,7 +230,7 @@ saveGIF({
 
 ##plot 1000 simulations
 
-pdf("toy31000simulations.pdf", width = 10, height = 7, paper = "USr")
+pdf("toy2_1000simulations.pdf", width = 10, height = 7, paper = "USr")
 
 plot(simulation_list[[1]][[1]][[1]], ylim = c(0,100), cex = 0.1, 
       ylab= "Mean trait proportion value", xlab="Time")
