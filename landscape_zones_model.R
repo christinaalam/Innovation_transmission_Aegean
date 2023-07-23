@@ -42,16 +42,16 @@ distfun.exp <- function(x,b){exp(-b*x)} #Distance decay function
 
 
 ##load data/parameter values
-ttstep <- 14 # number of timesteps
+
 nnodes <- 2000 # number of nodes
 seeds <- c(1)
 phlen <- c(175,258,142,163,49,138,38,72,145,55,35,57,128,133)
 dur <- sum(phlen)
 tstep <- dur
 alpha <- 1.2
-#kappa <- seq(from=0.5, to=0.7,by = 0.1)
 kappa <- 0.2
-loss <- 1 ##trait loss allowed when loss = 1, set loss = 0 for no loss
+#kappa <- seq(from=0.5, to=0.7,by = 0.1) #alternatively, if you want multiple kappa values
+loss <- 1 #trait loss allowed when loss = 1, set loss = 0 for no loss
 
 
 directory <- getwd()
@@ -152,6 +152,9 @@ plot(aegeanslope3to4)
 ##Add coastdist1to5 (the categorical distance to coast) and aegeanslope3to4 (the categorical slope) using the raster:overlay() function.
 
 #ddrast <- raster::overlay(coastdist1to5,aegeanslope3to4, fun=function(x,y){return(x+y)})
+
+##or just add them
+
 addrast <- coastdist1to5 + aegeanslope3to4
 rclmat <- matrix(c(3, 0, 9, 4, 8, 3, 5, 2, 4, 1),
                  ncol=2, byrow=TRUE)
@@ -305,51 +308,6 @@ saveGIF({
                                              upper = upper, lower = lower)},
   movie.name = "simulation_video_landscape.gif",interval = 0.1, ani.height = 500, ani.width = 500
 )
-
-
-##PLOT MULTIPLE ORIGINS
-
-
-pdf("means_different_origins_loss_n2000a1.2k0.2landscape2.pdf", width = 10, height = 7, paper = "USr")
-
-plot(meanaki1, ylim = c(0,100), cex = 0.05, 
-     ylab= "Mean trait proportion value", xlab="Time", col = "white")
-lines(meanaki1, col = "darkblue", lwd = 4, lty=1)
-lines(meanaki2, col = "cyan4", lwd = 4, lty=2)
-lines(meanaki3, col = "darkseagreen", lwd = 4, lty=3)
-lines(meanaki4, col = "darkred", lwd = 4, lty=4)
-lines(meanaki5, col = "darkmagenta", lwd = 4, lty=5)
-lines(meanaki6, col = "forestgreen", lwd = 4, lty=6)
-lines(meanaki7, col = "deeppink2", lwd = 4, lty=7)
-lines(meanaki8, col = "black", lwd = 4, lty=8)
-lines(meanaki9, col = "darkgoldenrod3", lwd = 4, lty=9)
-legend(1, 95, legend=c("NW", "W", "SW", "S", "SE", "E", "NE", "N", "Center"),
-       col=c("darkblue","cyan4","darkseagreen","darkred","darkmagenta",
-             "forestgreen","deeppink2","black", "darkgoldenrod3"), lty=1:9, cex=0.9,
-       title="Origin point", text.font=4, bg='white')
-
-dev.off()
-
-
-##plot 11/03/2022 geo
-
-n7000g <- meansmatrixlistlist[[1]][[1]]
-
-pop <- c(1000, 2000, 3000, 4000, 5000, 6000)
-rbPal <- colorRampPalette(c('lightblue','blue'))
-popcols <- rbPal(length(pop))[as.numeric(cut(pop,breaks = length(pop)))]
-
-pdf("pop1000to6000geok0.6a1.2.pdf")
-
-plot(n1000g, 
-     ylim = c(0,100), cex = 0.1, ylab= "Mean adoption percentage", xlab="Time", sub=paste("kappa = ",kappa,", alpha = " , alpha))
-lines(n1000g, col = popcols[1], lwd = 3)
-lines(n2000g, col = popcols[2], lwd = 3)
-lines(n3000g, col = popcols[3], lwd = 3)
-lines(n4000g, col = popcols[4], lwd = 3)
-lines(n5000g, col = popcols[5], lwd = 3)
-lines(n6000g, col = popcols[6], lwd = 3)
-legend("topleft",legend=as.character(pop),fill = popcols, col=popcols, cex=0.6, title="N")
 
 
 dev.off()
