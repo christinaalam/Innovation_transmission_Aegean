@@ -1,6 +1,3 @@
-##This script includes a function to compare simulation to empirical data and sets up a workflow to 
-##sweep parameter values and produce a parameter space map.
-
 ##load libraries
 
 library(rgdal)
@@ -14,7 +11,7 @@ library(readxl)
 library(lattice)
 library(raster)
 
-##FUNCTION DEFINITIONS
+##Function definitions
 
 ##define diffusion function
 diffusion <- function(x, wm, a, cap=1){
@@ -44,7 +41,7 @@ diffusion.nloss <- function(x, wm, a, cap=1){
 distfun.exp <- function(x,b){exp(-b*x)} #Distance decay function
 
 
-##LOAD DATA
+##Load data
 
 
 ##load simulation data/parameter values
@@ -63,7 +60,7 @@ ymx <- 100
 
 ##set up the points and network
 
-set.seed(30)
+set.seed(30) ##seed for random number generation
 
 ##define toy environment (a square with a side = 10)
 square <- rbind(c(xmn,ymn), c(xmx, ymn),c(xmx, ymx), c(xmn, ymx), c(xmn,ymn))
@@ -83,6 +80,7 @@ points[,2] <- pointy
 
 
 ##SIMULATION - Double nested loop, outer loop sweeps alpha, inner loop sweeps kappa
+
 weightmatl <- vector(mode = "list", length = length(alpha))
 meansmatrixlistlist <- vector(mode = "list", length = length(alpha))
 resultsllist <- vector(mode = "list", length = length(alpha))
@@ -100,10 +98,14 @@ for (a in 1:length(alpha)){
     trait[1] <- origin # this sets the origin point trait proportion value
     trait0 <- trait
     
-    results <- matrix(NA, nrow = n, ncol = tstep) # results matrix (size is determined by parameter values set at the beginning)
+   results <- matrix(NA, nrow = n, ncol = tstep) # results matrix (size is determined by parameter values set at the beginning)
     results[,1] <- trait0
     for (p in 2:ncol(results)){
-      trait <- diffusion.nloss(x = trait, wm = weightl[[l]], a=alpha[a])
+      if(loss == 0){
+        trait <- diffusion(x = trait, wm = weightl[[l]], a=alpha[a])
+      } else {
+        trait <- diffusion.nloss(x = trait, wm = weightl[[l]], a=alpha[a])
+      }
       results[,p] <- trait
     }
     resultsl[[l]] <- results
@@ -123,7 +125,7 @@ for (a in 1:length(alpha)){
 }
 
 
-##PLOT SYSTEM
+##Plots
 
 ##edge list
 
@@ -134,8 +136,8 @@ for (z in 1:n){
 }
 empt1 <- do.call("rbind", empt)
 
-##PLOTTING FUNCTION DEFINITION BEGINS HERE
-plot.fun.toy4 <- function(Timestep,Nodes,Results, meantrend, edges, aind, kind){ #aind is index of alpha, kind is index of kappa
+##Plotting function
+plot.fun.toy3 <- function(Timestep,Nodes,Results, meantrend, edges, aind, kind){ #aind is index of alpha, kind is index of kappa
   Nodes <- as.data.frame(Nodes)
   colnames(Nodes) <- c("x", "y")
   Nodes$Value <- Results[,Timestep]
@@ -173,82 +175,16 @@ betw <- sna::betweenness(weightz,ignore.eval=FALSE) ##second argument includes w
 t <- 30
 plot(x = betw, y = log(resultaki[,t]))
 
-##pdf("toy5n500k0.4a1.2origin0.01tstep10.pdf", width = 10, height = 7, paper = "USr")
+##pdf("toy3.pdf", width = 10, height = 7, paper = "USr")
 
-plot.fun.toy4(Timestep = t,Nodes=nranl[[1]], Results=resultaki, meantrend = meanaki, edges = empt1, aind = 1, kind = 1)
+plot.fun.toy3(Timestep = t,Nodes=nranl[[1]], Results=resultaki, meantrend = meanaki, edges = empt1, aind = 1, kind = 1)
 
 ##dev.off()
 
 ##map and timeseries
 
 saveGIF({
-  for (i in 1:tstep) plot.fun.toy4(Timestep = i,Nodes=nranl[[1]], Results=resultaki, meantrend = meanaki, edges = empt1, aind = 1,
+  for (i in 1:tstep) plot.fun.toy3(Timestep = i,Nodes=nranl[[1]], Results=resultaki, meantrend = meanaki, edges = empt1, aind = 1,
                                    kind = 1)},
-  movie.name = "13012023_toy5_a1k0.8n500.gif",interval = 0.1, ani.height = 500, ani.width = 500
+  movie.name = "video_toy3.gif",interval = 0.1, ani.height = 500, ani.width = 500
 )
-
-
-##Load results for qualitative sweep for N, kappa, alpha (separate panels for each N (200, 300, 400, 500, 600, 700), seed 30
-## variable recorded was presence, somewhat presence, or absence of cluster-driven diffusion dummy coded as 0, 0.5, 1, NA 
-## where NA stands for unsuccessful diffusion beyond the origin cluster
-
-N200 <- c(1, NA, NA, NA, NA, 1, 1, NA, NA, NA, 0.5, 1, 1, NA, NA, 0.5, 1, 1, 1, 1, 0.5, 1, 1, 1, 1)
-N200 <- matrix(N200, nrow = length(kappa), ncol = length(alpha))
-N200r <- raster(N200)
-
-
-N300 <- c(0.5, 1, 1, 1, NA, 0, 1, 0.5, 1, 1, 0, 1, 1, 1, 1, 0, 0.5, 1, 1, 0.5, 0, 0, 0.5, 0.5, 0.5)
-N300 <- matrix(N300, nrow = length(kappa), ncol = length(alpha))
-N300r <- raster(N300)
-
-N400 <- c(0,1,1,NA,NA,0, 0.5, 1, 1, 1, 0,0, 1, 1, 1, 0,0,0,0.5,1,0,0,0,0.5,0.5)
-N400 <- matrix(N400, nrow = length(kappa), ncol = length(alpha))
-N400r <- raster(N400)
-
-
-N500 <- c(0,0.5,1,1,NA,0,0.5,1,1,1,0,0,1,1,1,0,0,0.5,1,1,0,0,0,0,1)
-N500 <- matrix(N500, nrow = length(kappa), ncol = length(alpha))
-N500r <- raster(N500)
-
-
-N600 <- c(0,0.5,1,1,1,0,0,1,1,1,0,0,0.5,1,1,0,0,0,0.5,0.5,0,0,0,0,0.5)
-N600 <- matrix(N600, nrow = length(kappa), ncol = length(alpha))
-N600r <- raster(N600)
-
-
-N700 <- c(0,0,1,1,1,0,0,1,1,1,0,0,0.5,1,1,0,0,0,0.5,0.5,0,0,0,0,0)
-N700 <- matrix(N700, nrow = length(kappa), ncol = length(alpha))
-N700r <- raster(N700)
-
-##PLOTS
-
-pdf("toymodel4_qualitative_seed30.pdf")
-
-plotlist <- c(N200r, N300r, N400r, N500r , N600r, N700r)
-Ns <-seq(from = 200, to = 700, by = 100)
-par(mfrow=c(2,3))
-for (i in 1:length(plotlist)){
-  plot(plotlist[[i]], xaxt = "n", yaxt = "n", xlab = "alpha", ylab = "kappa", main = paste("N =",Ns[i]))
-  axis(1, at = seq(0.1,0.9, by = 0.2),labels = alpha)
-  axis(2, at = rev(seq(0.1,0.9, by = 0.2)),labels = kappa)
-}
-
-dev.off()
-
-##plot param space map for scaling param for all N
-
-pdf("sweep14092022_toymodel4_nodes_scaling_seed30.pdf")
-
-N_scal_list <- list(scal_matN200, scal_matN300, scal_matN400, scal_matN500, scal_matN600, scal_matN700)
-N_scal_list2 <- lapply(N_scal_list, FUN = raster)
-Ns <-seq(from = 200, to = 700, by = 100)
-par(mfrow=c(2,3))
-for (i in 1:length(N_scal_list2)){
-  plot(N_scal_list2[[i]],main = paste("N =",Ns[i]), 
-       xlab = "kappa", ylab = "alpha", xaxt = "n", yaxt = "n")
-  axis(1, at = seq(0.1,0.9, by = 0.2),labels = kappa)
-  axis(2, at = rev(seq(0.1,0.9, by = 0.2)),labels = alpha)
-}
-
-dev.off()
-
