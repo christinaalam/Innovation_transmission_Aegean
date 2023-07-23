@@ -1,4 +1,4 @@
-##Toy Model 2 -  Ring networks!
+##Toy Model 1
 
 ##load libraries
 library(rgdal)
@@ -139,7 +139,7 @@ empt1 <- do.call("rbind", empt)
 
 ##plot 
 
-#pdf("toy2environment.pdf", width = 10, height = 7, paper = "USr")
+#pdf("toy1environment.pdf", width = 10, height = 7, paper = "USr")
 
 
 plot(points, asp = 1, pch = 19, col = alpha("lightblue", 0.8), cex = 3,
@@ -153,7 +153,7 @@ for (u in 1:nrow(empt1)){
 
 
 ##Plotting function
-plot.fun.toy2 <- function(Timestep,Nodes,Results, meantrend, edges, upper, lower){
+plot.fun.toy1 <- function(Timestep,Nodes,Results, meantrend, edges, upper, lower){
   Nodes <- as.data.frame(Nodes)
   colnames(Nodes) <- c("x", "y")
   Nodes$Value <- Results[,Timestep]
@@ -188,10 +188,10 @@ lower <- meanaki - sdaki
 
 ##test, apply function to a single timestep
 
-pdf("toy2.pdf", width = 10, height = 7, paper = "USr")
+pdf("toy1.pdf", width = 10, height = 7, paper = "USr")
 
 t <- 5
-plot.fun.toy2(Timestep = t,Nodes=nranl[[1]], Results=resultaki, meantrend = meanaki, edges = empt1,
+plot.fun.toy1(Timestep = t,Nodes=nranl[[1]], Results=resultaki, meantrend = meanaki, edges = empt1,
               upper = upper, lower = lower)
 
 dev.off()
@@ -199,7 +199,7 @@ dev.off()
 ##map and timeseries
 
 saveGIF({
-  for (i in 1:tstep) plot.fun.toy2(Timestep = i,Nodes=nranl[[1]], Results=resultaki, meantrend = meanaki, edges = empt1)},
-  movie.name = "15082022_toy2k1a1origin0.000000001.gif",interval = 0.1, ani.height = 500, ani.width = 500
+  for (i in 1:tstep) plot.fun.toy1(Timestep = i,Nodes=nranl[[1]], Results=resultaki, meantrend = meanaki, edges = empt1)},
+  movie.name = "toy1.gif",interval = 0.1, ani.height = 500, ani.width = 500
 )
 
